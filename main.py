@@ -1,3 +1,5 @@
+# coding=utf8
+
 import urllib2
 import os
 import sys
@@ -7,6 +9,7 @@ from bs4 import BeautifulSoup
 def find_title(first_page):
     title = first_page.find('div', id='gd2').find('h1', id='gj').get_text()
     print title
+    title = title.replace("/", "_")
     if (os.path.exists(title)):
         print "Already Downloaded"
         return None
