@@ -4,7 +4,7 @@ import urllib2
 import os
 import sys
 from bs4 import BeautifulSoup
-
+import re
 
 def find_title(first_page):
     title = first_page.find('div', id='gd2').find('h1', id='gj').get_text()
@@ -53,16 +53,22 @@ def open_page(url, title):
                         print 'Download Failed'
                         return
                     print "Opening Page %d" % index
-                    open_page = BeautifulSoup(urllib2.urlopen(current_page), 'lxml')
+                    content = urllib2.urlopen(current_page)
+                    # print content.read()
+                    open_page = BeautifulSoup(content.read(), 'lxml')
                 except:
                     page_fails += 1
                     print "Opening Page %d Fail %d" % (index, page_fails)
                 else:
-                    img_url = open_page.find('img', id='img')['src']
+                    # img_url = open_page.find('img', id='img')['src']
+                    img = open_page.find('img', onerror=re.compile(r"this.onerror=null"))
+                    img_url = img['src']
                     path = os.path.join(title, "%02d" % index + os.path.splitext(img_url)[1])
                     download_img(img_url, path, index)
                     last_page = current_page
-                    current_page = open_page.find('div', id='i3').find('a')['href']
+                    # current_page = open_page.find('div', id='i3').find('a')['href']
+                    current_page = img.parent['href']
+
                     break
 
 if __name__ == '__main__':
